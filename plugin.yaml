@@ -1,0 +1,16 @@
+name: answer-summary
+version: 1.0.0
+description: >-
+  AI recaps for Hermes Desktop: a short summary above the composer for every
+  assistant reply, a one-click Catch up recap for the whole session, and a
+  right-docked Discuss side chat that inherits the conversation and can hand a
+  structured outcome back to the main composer.
+manifest_version: 1
+kind: standalone
+author: ArronPK
+license: MIT
+homepage: https://github.com/ArronPK/hermes-answer-summary
+requires_hermes: ">=0.23.0"
+capabilities: []
+requires_env: []
+python_dependencies: []
