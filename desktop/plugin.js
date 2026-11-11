@@ -22,6 +22,7 @@ import {
   DialogHeader,
   DialogTitle,
   host,
+  MessageTextContent,
   Select,
   SelectContent,
   SelectItem,
@@ -1779,8 +1780,14 @@ function DiscussPane({ chatId }) {
               'div',
               {
                 'data-selectable-text': 'true',
-                style: message.role === 'user' ? userBubble : assistantBubble,
-                children: message.text
+                style:
+                  message.role === 'user'
+                    ? userBubble
+                    : { ...assistantBubble, whiteSpace: 'normal' },
+                children:
+                  message.role === 'assistant'
+                    ? jsx(MessageTextContent, { text: message.text, media: false })
+                    : message.text
               },
               index
             )
@@ -1788,8 +1795,8 @@ function DiscussPane({ chatId }) {
           chat.streaming
             ? jsx('div', {
                 'data-selectable-text': 'true',
-                style: assistantBubble,
-                children: chat.streaming
+                style: { ...assistantBubble, whiteSpace: 'normal' },
+                children: jsx(MessageTextContent, { text: chat.streaming, media: false })
               })
             : null,
           chat.busy && !chat.streaming
