@@ -932,7 +932,7 @@ function requestDiscuss() {
       ? state.active
       : (state && state.sessions && state.sessions[0]) || null
   if (existing) {
-    void continueDiscuss(existing)
+    setDiscussUi({ busy: false, error: '', dialog: { record: existing } })
     return
   }
   void createDiscuss()
@@ -2041,10 +2041,10 @@ function DiscussLauncher() {
         children: [
           jsxs(DialogHeader, {
             children: [
-              jsx(DialogTitle, { children: 'Side chat already exists' }),
+              jsx(DialogTitle, { children: 'Side chats' }),
               jsx(DialogDescription, {
                 children:
-                  'Continue the existing discussion, or start a new side chat with a fresh copy of this session.'
+                  'Resume the existing discussion, or start a new side chat with a fresh copy of this session.'
               })
             ]
           }),
@@ -2075,7 +2075,7 @@ function DiscussLauncher() {
               jsx(Button, {
                 onClick: () => void continueDiscuss(dialog.record),
                 disabled: discussUi.busy,
-                children: discussUi.busy ? 'Opening…' : 'Continue existing'
+                children: discussUi.busy ? 'Opening…' : 'Resume'
               })
             ]
           })
