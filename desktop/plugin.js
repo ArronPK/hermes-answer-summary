@@ -1456,16 +1456,19 @@ function DiscussPane({ chatId }) {
   }
 
   async function deleteManagerRow(record) {
-    if (!window.confirm(`Delete "${record.title || 'this side chat'}"? This cannot be undone.`)) {
-      return
-    }
     setManagerBusy(`${record.childStoredId}:delete`)
     setManagerError('')
     try {
       await host
         .request('session.close', { session_id: record.childRuntimeId }, 60000)
         .catch(() => undefined)
-      await host.request('session.delete', { session_id: record.childStoredId }, 60000)
+      // The canonical gateway does not expose session.delete to plugins, so
+      // remove the side chat by archiving it and dropping our registry row.
+      await host.request(
+        'session.archive',
+        { session_id: record.childStoredId, archived: true },
+        60000
+      )
       const state = discussByParent.get(record.parentKey)
       if (state) {
         state.sessions = state.sessions.filter(
