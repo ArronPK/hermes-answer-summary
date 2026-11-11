@@ -2,6 +2,8 @@
 
 Answer Summary is a Hermes Desktop plugin for long conversations. It keeps the latest answer short, turns the whole session into a catch-up brief, and lets you open a focused side discussion without disturbing the main chat.
 
+![Illustrative example of Answer Summary in Hermes Desktop](docs/example-summary.png)
+
 ## What it does
 
 - **Reply summary.** A compact AI recap of the latest assistant reply sits above the composer. It starts expanded, scrolls within a bounded body, and caches by message hash.
