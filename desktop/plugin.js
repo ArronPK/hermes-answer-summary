@@ -746,8 +746,6 @@ async function createDiscuss() {
     const created = await host.request(
       'session.create',
       {
-        parent_session_id: parent.storedId || undefined,
-        messages: seeded,
         title: fallbackTitle,
         source: 'desktop',
         model: parentModel || undefined,
@@ -1672,10 +1670,14 @@ function DiscussPane({ chatId }) {
     chat.error = ''
     chat.status = 'Thinking…'
     emitDiscuss()
+    const firstTurn = chat.messages.filter(message => message.role === 'assistant').length === 0
+    const seed = firstTurn && chat.seedTranscript
+      ? `Session context (compacted transcript):\n${chat.seedTranscript}\n\n`
+      : ''
     host
       .request(
         'prompt.submit',
-        { session_id: chatId, text: `${DISCUSSION_PREFIX}${text}` },
+        { session_id: chatId, text: `${DISCUSSION_PREFIX}${seed}${text}` },
         120000
       )
       .catch(err => {
