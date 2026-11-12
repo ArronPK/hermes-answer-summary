@@ -28,6 +28,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  surfaceModelSwitchConfirm,
   Textarea,
   useValue,
   writeClipboardText
@@ -784,15 +785,6 @@ async function createDiscuss() {
         }
       }
     }
-    // Discussion-only side chats must never stall on an approval the pane
-    // cannot render. Session scope keeps this out of the profile config.
-    await host
-      .request(
-        'config.set',
-        { key: 'yolo', value: 'on', scope: 'session', session_id: childRuntimeId },
-        60000
-      )
-      .catch(() => undefined)
     const record = {
       parentKey: parent.key,
       parentSessionId: parent.sessionId,
@@ -1639,23 +1631,39 @@ function DiscussPane({ chatId }) {
     if (!option) {
       return
     }
+    const previous = models.value
     setModels(state => ({ ...state, switching: true, error: '', value }))
-    try {
-      await host.request(
+    const requestSwitch = confirmed =>
+      host.request(
         'config.set',
         {
           key: 'model',
           value: `${option.model} --provider ${option.provider}`,
           session_id: chatId,
-          confirm_expensive_model: true
+          ...(confirmed ? { confirm_expensive_model: true } : {})
         },
         120000
       )
+    try {
+      const first = await requestSwitch(false)
+      if (first && first.confirm_required) {
+        const applied = await surfaceModelSwitchConfirm({
+          confirmMessage: first.confirm_message,
+          failureMessage: 'Could not switch model',
+          model: option.model,
+          requestConfirmed: () => requestSwitch(true)
+        })
+        if (!applied) {
+          setModels(state => ({ ...state, switching: false, error: '', value: previous }))
+          return
+        }
+      }
       setModels(state => ({ ...state, switching: false, label: option.label }))
     } catch (err) {
       setModels(state => ({
         ...state,
         switching: false,
+        value: previous,
         error: (err && err.message) || 'Could not switch model'
       }))
     }
